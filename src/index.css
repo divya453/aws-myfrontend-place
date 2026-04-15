@@ -1,0 +1,12 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* This stops your inputs from breaking the layout */
+}
+
+body {
+  background-color: #0c1116; /* GitHub Dark Theme */
+  color: #f1f6fd;
+  font-family: 'Montserrat', sans-serif;
+  overflow-x: hidden; /* Prevents annoying side-scrolling on mobile */
+}

@@ -1,0 +1,218 @@
+.issue-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.issue-modal {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  width: 500px;
+  max-width: 90%;
+  padding: 20px;
+  color: white;
+  position: relative;
+}
+
+.issue-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.issue-modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.issue-modal-close {
+  cursor: pointer;
+  color: #8b949e;
+  transition: color 0.2s;
+}
+
+.issue-modal-close:hover {
+  color: white;
+}
+
+/* Repo selector */
+.issue-modal-repo {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.issue-modal-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #8b949e;
+  margin-bottom: 6px;
+}
+
+.issue-modal-repo-selector {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.issue-modal-repo-selector:hover {
+  border-color: white;
+}
+
+.issue-modal-repo-dropdown {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  z-index: 999;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.issue-modal-repo-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.issue-modal-repo-item:hover {
+  background-color: #21262d;
+}
+
+.issue-modal-no-repos {
+  padding: 10px 15px;
+  color: #8b949e;
+  font-size: 0.85rem;
+}
+
+/* Blank issue template */
+.issue-modal-template {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.issue-modal-template:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: white;
+}
+
+.issue-modal-template-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.issue-modal-template-desc {
+  margin: 4px 0 0 0;
+  font-size: 0.8rem;
+  color: #8b949e;
+}
+
+/* Form */
+.issue-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.issue-modal-input {
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: white;
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.issue-modal-input:focus {
+  outline: none;
+  border-color: white;
+}
+
+.issue-modal-textarea {
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: white;
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.issue-modal-textarea:focus {
+  outline: none;
+  border-color: white;
+}
+
+.issue-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.issue-modal-cancel {
+  background-color: transparent;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 8px 16px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.issue-modal-cancel:hover {
+  background-color: #21262d;
+}
+
+.issue-modal-submit {
+  background-color: #238636;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.issue-modal-submit:hover {
+  background-color: #2ea043;
+}
+
+.issue-modal-submit:disabled {
+  background-color: #21262d;
+  cursor: not-allowed;
+  color: #8b949e;
+}

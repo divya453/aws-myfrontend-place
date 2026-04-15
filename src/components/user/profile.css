@@ -1,0 +1,286 @@
+.profile-loading {
+  color: white;
+  padding: 20px;
+}
+
+/* Tabs */
+.profile-tabs {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 20px;
+  border-bottom: 1px solid #30363d;
+  background-color: #0d1117;
+  overflow-x: auto;
+}
+
+.profile-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  color: #8b949e;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.profile-tab:hover {
+  color: white;
+}
+
+.profile-tab-active {
+  color: white;
+  border-bottom: 2px solid #f78166;
+}
+
+.profile-tab-count {
+  background-color: #21262d;
+  color: #8b949e;
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 0.75rem;
+}
+
+/* Golden star on hover and active */
+.stars-tab:hover .MuiSvgIcon-root,
+.stars-tab.profile-tab-active .MuiSvgIcon-root {
+  color: #e3b341;
+}
+
+/* Wrapper */
+.profile-wrapper {
+  display: flex;
+  color: white;
+  padding: 20px;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Left sidebar */
+.profile-left {
+  width: 260px;
+  min-width: 260px;
+}
+
+.profile-avatar {
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background-color: #3d3d3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  font-weight: bold;
+  color: white;
+}
+
+.profile-username {
+  margin-top: 15px;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.profile-email {
+  color: #8b949e;
+  margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+.profile-follow-btn {
+  width: 100%;
+  padding: 8px;
+  margin-top: 15px;
+  background-color: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.profile-follow-btn:hover {
+  background-color: #30363d;
+}
+
+.profile-follow-btn.following {
+  background-color: #21262d;
+  border: 1px solid #f85149;
+  color: #f85149;
+}
+
+.profile-follow-btn.following:hover {
+  background-color: #3d1111;
+}
+
+.profile-stats {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 15px;
+  color: #8b949e;
+  font-size: 0.9rem;
+}
+
+.profile-stats strong {
+  color: white;
+}
+
+/* Right content */
+.profile-right {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-section-header {
+  font-size: 1rem;
+  color: #8b949e;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #30363d;
+}
+
+/* Repos grid (overview tab - 2 columns) */
+.profile-repos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+/* Repos list (repos & stars tabs - vertical with gap) */
+.profile-repos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Repo cards */
+.profile-repo-card {
+  padding: 15px;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+.profile-repo-card:hover {
+  border-color: white;
+  cursor: pointer;
+}
+
+.profile-repo-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+}
+
+.profile-repo-name h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.profile-repo-description {
+  color: #8b949e;
+  margin: 5px 0 0 0;
+  font-size: 0.85rem;
+}
+
+/* Heatmap */
+.profile-heatmap {
+  margin-top: 30px;
+  padding: 20px;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+
+.profile-no-content {
+  color: #8b949e;
+  font-size: 0.9rem;
+}
+
+/* ================================
+   MOBILE RESPONSIVE (max 480px)
+================================ */
+@media screen and (max-width: 480px) {
+
+  .profile-wrapper {
+    flex-direction: column;
+    padding: 15px;
+    gap: 20px;
+  }
+
+  .profile-left {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    font-size: 40px;
+  }
+
+  .profile-username {
+    font-size: 1.2rem;
+  }
+
+  .profile-right {
+    width: 100%;
+  }
+
+  .profile-repos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-tabs {
+    padding: 0 10px;
+  }
+
+  .profile-tab {
+    padding: 10px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ================================
+   TABLET RESPONSIVE (max 768px)
+================================ */
+@media screen and (max-width: 768px) {
+
+  .profile-wrapper {
+    flex-direction: column;
+    padding: 15px;
+    gap: 20px;
+  }
+
+  .profile-left {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .profile-avatar {
+    width: 150px;
+    height: 150px;
+    font-size: 50px;
+  }
+
+  .profile-right {
+    width: 100%;
+  }
+
+  .profile-repos-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,193 @@
+.issues-wrapper {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+  color: white;
+}
+
+/* Header */
+.issues-header {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #30363d;
+}
+
+.issues-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Empty state card */
+.issues-empty-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 20px;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  background-color: #161b22;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Close icon row - top right inside card */
+.issues-empty-card-top {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.issues-close-icon {
+  cursor: pointer;
+  color: #8b949e;
+  transition: color 0.2s;
+}
+
+.issues-close-icon:hover {
+  color: white;
+}
+
+.issues-empty-title {
+  font-size: 1.1rem;
+  color: #e6edf3;
+}
+
+.issues-empty-desc {
+  font-size: 0.9rem;
+  color: #8b949e;
+}
+
+/* Create button row - bottom right inside card */
+.issues-empty-card-bottom {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.issues-create-btn {
+  background-color: #238636;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.issues-create-btn:hover {
+  background-color: #2ea043;
+}
+
+/* Issues list */
+.issues-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.issues-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  background-color: #161b22;
+  transition: border-color 0.2s;
+}
+
+.issues-card:hover {
+  border-color: white;
+  cursor: pointer;
+}
+
+.issues-card-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.issues-card-title {
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: #e6edf3;
+  margin-bottom: 4px;
+}
+
+.issues-card-desc {
+  font-size: 0.8rem;
+  color: #8b949e;
+}
+
+/* ================================
+   MOBILE RESPONSIVE (max 480px)
+================================ */
+@media screen and (max-width: 480px) {
+
+  .issues-wrapper {
+    margin: 15px auto;
+    padding: 15px;
+  }
+
+  .issues-title {
+    font-size: 1.2rem;
+  }
+
+  .issues-empty-title {
+    font-size: 1rem;
+  }
+
+  .issues-empty-desc {
+    font-size: 0.85rem;
+  }
+
+  /* Full width button on mobile */
+  .issues-empty-card-bottom {
+    justify-content: stretch;
+  }
+
+  .issues-create-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+  }
+
+  .issues-card {
+    padding: 12px;
+    flex-direction: column; /* ← stack on mobile */
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .issues-card-left {
+    gap: 8px;
+  }
+
+  .issues-card-title {
+    font-size: 0.9rem;
+  }
+
+  .issues-card-desc {
+    font-size: 0.75rem;
+  }
+}
+
+/* ================================
+   TABLET RESPONSIVE (max 768px)
+================================ */
+@media screen and (max-width: 768px) {
+
+  .issues-wrapper {
+    margin: 20px auto;
+    padding: 15px;
+  }
+
+  .issues-card {
+    padding: 12px;
+  }
+}

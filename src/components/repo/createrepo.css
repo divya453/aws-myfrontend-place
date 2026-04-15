@@ -1,0 +1,274 @@
+.create-repo-wrapper {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+  color: white;
+}
+
+.create-repo-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.create-repo-divider {
+  border: none;
+  border-top: 1px solid #30363d;
+  margin: 20px 0;
+}
+
+.create-repo-form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Owner + name row */
+.create-repo-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.create-repo-slash {
+  font-size: 1.5rem;
+  color: #8b949e;
+  padding-bottom: 8px;
+}
+
+.create-repo-field {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+}
+
+.create-repo-label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: white;
+}
+
+.create-repo-optional {
+  color: #8b949e;
+  font-weight: normal;
+}
+
+.create-repo-input {
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 5px;
+  padding: 8px 12px;
+  color: white;
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.create-repo-input:focus {
+  outline: none;
+  border-color: white;
+}
+
+/* Owner dropdown */
+.create-repo-owner-search {
+  position: relative;
+}
+
+.create-repo-dropdown {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  z-index: 999;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.create-repo-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.create-repo-dropdown-item:hover {
+  background-color: #21262d;
+}
+
+.create-repo-dropdown-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #238636;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+/* Visibility */
+.create-repo-visibility {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.create-repo-visibility-option {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.create-repo-visibility-option:hover {
+  border-color: white;
+}
+
+.create-repo-visibility-option.active {
+  border-color: white;
+  background-color: #0d1117;
+}
+
+.create-repo-visibility-radio {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #30363d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.create-repo-visibility-radio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: white;
+}
+
+.create-repo-visibility-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.create-repo-visibility-desc {
+  margin: 3px 0 0 0;
+  font-size: 0.8rem;
+  color: #8b949e;
+}
+
+/* Submit */
+.create-repo-submit {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.create-repo-btn {
+  background-color: #238636;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.create-repo-btn:hover {
+  background-color: #2ea043;
+}
+
+.create-repo-btn:disabled {
+  background-color: #21262d;
+  cursor: not-allowed;
+  color: #8b949e;
+}
+
+/* ================================
+   MOBILE RESPONSIVE (max 480px)
+================================ */
+@media screen and (max-width: 480px) {
+
+  .create-repo-wrapper {
+    margin: 15px auto;
+    padding: 15px;
+  }
+
+  .create-repo-title {
+    font-size: 1.2rem;
+  }
+
+  /* Stack owner and repo name vertically */
+  .create-repo-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  /* Hide slash on mobile */
+  .create-repo-slash {
+    display: none;
+  }
+
+  .create-repo-visibility-option {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .create-repo-visibility-title {
+    font-size: 0.85rem;
+  }
+
+  .create-repo-visibility-desc {
+    font-size: 0.75rem;
+  }
+
+  /* Full width button on mobile */
+  .create-repo-submit {
+    justify-content: stretch;
+  }
+
+  .create-repo-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+  }
+}
+
+/* ================================
+   TABLET RESPONSIVE (max 768px)
+================================ */
+@media screen and (max-width: 768px) {
+
+  .create-repo-wrapper {
+    margin: 20px auto;
+    padding: 15px;
+  }
+
+  /* Stack owner and repo name vertically on tablet too */
+  .create-repo-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .create-repo-slash {
+    display: none;
+  }
+}
