@@ -17,7 +17,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchRepositories = async () => {
       try {
-        const res = await axios.get(`http://3.108.191.174:3000/repo/user/${userId}`);
+        const res = await axios.get(`https://version-backend-api.duckdns.org/repo/user/${userId}`);
         setRepositories(res.data.repositories);
       } catch (err) {
         console.error("Error while fetching repositories:", err);
@@ -26,7 +26,7 @@ const Dashboard = () => {
 
     const fetchSuggestedRepositories = async () => {
       try {
-        const res = await axios.get(`http://3.108.191.174:3000/repo/all`);
+        const res = await axios.get(`https://version-backend-api.duckdns.org/repo/all`);
         setSuggestedRepositories(res.data);
       } catch (err) {
         console.error("Error while fetching suggested repositories:", err);

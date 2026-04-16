@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://pav2hg17kc.execute-api.ap-south-1.amazonaws.com", 
+  baseURL: "https://version-backend-api.duckdns.org",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -22,11 +22,14 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
+    // If the server explicitly says i am not logged in anymore
     if (error.response?.status === 401) {
       localStorage.removeItem("userId");
       localStorage.removeItem("token");
       window.location.href = "/auth";
     }
+    
+    
     return Promise.reject(error);
   }
 );

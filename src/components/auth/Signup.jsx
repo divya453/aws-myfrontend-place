@@ -21,7 +21,7 @@ const Signup = () => {
     try {
       setLoading(true);
       const res = await axios.post(
-        "http://3.108.191.174:3000/signup",
+        "https://version-backend-api.duckdns.org/signup",
         {
           email: email,
           password: password,
