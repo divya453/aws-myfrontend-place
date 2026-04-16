@@ -6,7 +6,7 @@ import StarIcon from "@mui/icons-material/Star";
 import AdjustRoundedIcon from "@mui/icons-material/AdjustRounded";
 import LockIcon from "@mui/icons-material/Lock";
 import PublicIcon from "@mui/icons-material/Public";
-import "./repoPage.css";
+import "./repopage.css";
 
 const RepoPage = () => {
   const { repoId } = useParams();
