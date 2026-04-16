@@ -4,7 +4,7 @@ import { useAuth } from "../../authContext";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import "./CreateIssue.css";
+import "./createIssue.css";
 
 const CreateIssueModal = () => {
   const { isIssueModalOpen, setIsIssueModalOpen } = useAuth();
