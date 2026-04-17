@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "../../axiosInstance";
 import BookIcon from "@mui/icons-material/Book";
 import StarIcon from "@mui/icons-material/Star";
@@ -9,6 +9,7 @@ import "./profile.css";
 
 const Profile = () => {
   const { userId } = useParams();
+  const navigate = useNavigate();
   const loggedInUserId = localStorage.getItem("userId");
   const isOwnProfile = userId === loggedInUserId;
 
@@ -20,61 +21,50 @@ const Profile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
+    const fetchAllProfileData = async () => {
+      setLoading(true);
       try {
-        const res = await axiosInstance.get(`/userProfile/${userId}`);
-        setUserDetails(res.data);
-      } catch (err) {
-        console.error("Cannot fetch user details:", err);
-      }
-    };
+        // Fetch everything in parallel for better performance
+        const [userRes, repoRes, allReposRes] = await Promise.all([
+          axiosInstance.get(`/userProfile/${userId}`),
+          axiosInstance.get(`/repo/user/${userId}`),
+          axiosInstance.get("/repo/all")
+        ]);
 
-    const fetchRepositories = async () => {
-      try {
-        const res = await axiosInstance.get(`/repo/user/${userId}`);
-        setRepositories(res.data.repositories || []);
+        const userData = userRes.data;
+        setUserDetails(userData);
+        setRepositories(repoRes.data.repositories || []);
+
+        // Handle Starred Repos logic
+        const starredIds = userData.starRepos || [];
+        const starred = allReposRes.data.filter((repo) =>
+          starredIds.some((id) => id.toString() === repo._id.toString())
+        );
+        setStarredRepoDetails(starred);
+
+        // Check follow status if logged in and not looking at own profile
+        if (loggedInUserId && !isOwnProfile) {
+          const loggedInUserRes = await axiosInstance.get(`/userProfile/${loggedInUserId}`);
+          const alreadyFollowing = loggedInUserRes.data.followedUsers?.some(
+            (id) => id.toString() === userId
+          );
+          setIsFollowing(alreadyFollowing);
+        }
       } catch (err) {
-        console.error("Error fetching repositories:", err);
+        console.error("Error fetching profile data:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    const checkIfFollowing = async () => {
-      try {
-        const res = await axiosInstance.get(`/userProfile/${loggedInUserId}`);
-        const loggedInUser = res.data;
-        const alreadyFollowing = loggedInUser.followedUsers?.some(
-          (id) => id.toString() === userId
-        );
-        setIsFollowing(alreadyFollowing);
-      } catch (err) {
-        console.error("Error checking follow status:", err);
-      }
-    };
-
-    const fetchStarredRepos = async () => {
-      try {
-        const res = await axiosInstance.get(`/userProfile/${userId}`);
-        const starredIds = res.data.starRepos || [];
-        const allReposRes = await axiosInstance.get("/repo/all");
-        const allRepos = allReposRes.data;
-        const starred = allRepos.filter((repo) =>
-          starredIds.some((id) => id.toString() === repo._id.toString())
-        );
-        setStarredRepoDetails(starred);
-      } catch (err) {
-        console.error("Error fetching starred repos:", err);
-      }
-    };
-
-    fetchUserDetails();
-    fetchRepositories();
-    fetchStarredRepos();
-    if (!isOwnProfile) checkIfFollowing();
-  }, [userId]);
+    fetchAllProfileData();
+  }, [userId, loggedInUserId, isOwnProfile]);
 
   const handleFollow = async () => {
+    if (!loggedInUserId) {
+      alert("Please login to follow users!");
+      return;
+    }
     try {
       const res = await axiosInstance.post(`/followUser`, {
         userId: loggedInUserId,
@@ -90,7 +80,7 @@ const Profile = () => {
   if (!userDetails) return <h2 className="profile-loading">User not found!</h2>;
 
   return (
-    <div>
+    <div className="profile-main-container">
       {/* Tab bar */}
       <div className="profile-tabs">
         <button
@@ -115,9 +105,7 @@ const Profile = () => {
         </button>
       </div>
 
-      {/* Main content */}
       <div className="profile-wrapper">
-
         {/* Left sidebar */}
         <div className="profile-left">
           <div className="profile-avatar">
@@ -143,8 +131,6 @@ const Profile = () => {
 
         {/* Right main content */}
         <div className="profile-right">
-
-          {/* Overview Tab */}
           {activeTab === "overview" && (
             <div>
               <h3 className="profile-section-header">Popular Repositories</h3>
@@ -153,7 +139,12 @@ const Profile = () => {
               ) : (
                 <div className="profile-repos-grid">
                   {repositories.slice(0, 6).map((repo) => (
-                    <div key={repo._id} className="profile-repo-card">
+                    <div 
+                      key={repo._id} 
+                      className="profile-repo-card"
+                      onClick={() => navigate(`/repo/${repo._id}`)}
+                      style={{ cursor: "pointer" }}
+                    >
                       <div className="profile-repo-name">
                         <h4>{repo.name}</h4>
                       </div>
@@ -162,15 +153,12 @@ const Profile = () => {
                   ))}
                 </div>
               )}
-
-              {/* Heatmap */}
               <div className="profile-heatmap">
                 <HeatMapProfile />
               </div>
             </div>
           )}
 
-          {/* Repos Tab */}
           {activeTab === "repos" && (
             <div>
               <h3 className="profile-section-header">Repositories</h3>
@@ -179,7 +167,12 @@ const Profile = () => {
               ) : (
                 <div className="profile-repos-list">
                   {repositories.map((repo) => (
-                    <div key={repo._id} className="profile-repo-card">
+                    <div 
+                      key={repo._id} 
+                      className="profile-repo-card"
+                      onClick={() => navigate(`/repo/${repo._id}`)}
+                      style={{ cursor: "pointer" }}
+                    >
                       <div className="profile-repo-name">
                         <BookIcon fontSize="small" />
                         <h4>{repo.name}</h4>
@@ -192,7 +185,6 @@ const Profile = () => {
             </div>
           )}
 
-          {/* Stars Tab */}
           {activeTab === "stars" && (
             <div>
               <h3 className="profile-section-header">Starred Repositories</h3>
@@ -201,7 +193,12 @@ const Profile = () => {
               ) : (
                 <div className="profile-repos-list">
                   {starredRepoDetails.map((repo) => (
-                    <div key={repo._id} className="profile-repo-card">
+                    <div 
+                      key={repo._id} 
+                      className="profile-repo-card"
+                      onClick={() => navigate(`/repo/${repo._id}`)}
+                      style={{ cursor: "pointer" }}
+                    >
                       <div className="profile-repo-name">
                         <BookIcon fontSize="small" />
                         <h4>{repo.name}</h4>
@@ -213,7 +210,6 @@ const Profile = () => {
               )}
             </div>
           )}
-
         </div>
       </div>
     </div>

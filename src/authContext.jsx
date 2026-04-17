@@ -15,6 +15,9 @@ export const AuthProvider = ({ children }) => {
     const userId = localStorage.getItem("userId");
     if (userId) {
       setCurrentUser(userId);
+    } else {
+      localStorage.removeItem("userId");
+      setCurrentUser(null);
     }
     setLoading(false);
   }, []);
@@ -23,6 +26,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("userId");
     localStorage.removeItem("token");
     setCurrentUser(null);
+    setIsIssueModalOpen(false);
   };
 
   const value = {
@@ -40,3 +44,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+

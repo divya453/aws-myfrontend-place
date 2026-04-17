@@ -13,14 +13,14 @@ import RepoPage from "./components/repo/RepoPage";
 // Auth Context
 import { useAuth } from "./authContext";
 
-// ── Protected Route wrapper ────────────────────────────────────────────────
+// Protected Route wrapper 
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = useAuth();
   if (!currentUser) return <Navigate to="/auth" replace />;
   return children;
 };
 
-// ── Main Routes ────────────────────────────────────────────────────────────
+// ── Main Routes 
 const ProjectRoutes = () => {
   const { currentUser, setCurrentUser } = useAuth();
   const navigate = useNavigate();

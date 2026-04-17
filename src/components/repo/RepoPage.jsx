@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import axiosInstance from "../../axiosInstance";
 import { useParams, useNavigate } from "react-router-dom";
+import axiosInstance from "../../axiosInstance"; 
 import BookIcon from "@mui/icons-material/Book";
 import StarIcon from "@mui/icons-material/Star";
 import AdjustRoundedIcon from "@mui/icons-material/AdjustRounded";
@@ -19,39 +19,48 @@ const RepoPage = () => {
   const [starred, setStarred] = useState(false);
 
   useEffect(() => {
-    const fetchRepo = async () => {
+    const fetchRepoData = async () => {
+      setLoading(true);
       try {
-        const res = await axiosInstance.get(`/repo/${repoId}`);
-        setRepo(res.data[0]);
+        // Fetch repository details
+        const repoRes = await axiosInstance.get(`/repo/${repoId}`);
+        // Backend returns an array, so we take the first element
+        const repoData = repoRes.data[0]; 
+        setRepo(repoData);
+
+        // Fetch starred status only if user is logged in
+        if (loggedInUserId) {
+          const userRes = await axiosInstance.get(`/userProfile/${loggedInUserId}`);
+          const starredList = userRes.data.starRepos?.map((id) => id.toString()) || [];
+          setStarred(starredList.includes(repoId.toString()));
+        }
       } catch (err) {
-        console.error("Error fetching repo:", err);
+        console.error("Error fetching repository data:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    const fetchStarredStatus = async () => {
-      try {
-        const res = await axiosInstance.get(`/userProfile/${loggedInUserId}`);
-        const starredList = res.data.starRepos?.map((id) => id.toString()) || [];
-        setStarred(starredList.includes(repoId.toString()));
-      } catch (err) {
-        console.error("Error fetching star status:", err);
-      }
-    };
-
-    fetchRepo();
-    if (loggedInUserId) fetchStarredStatus();
-  }, [repoId]);
+    fetchRepoData();
+  }, [repoId, loggedInUserId]);
 
   const handleStar = async () => {
-    if (!loggedInUserId) return;
+    if (!loggedInUserId) {
+      alert("Please login to star repositories!");
+      return;
+    }
     try {
       const res = await axiosInstance.post("/starRepo", {
         userId: loggedInUserId,
         repoId: repoId.toString(),
       });
       setStarred(res.data.starred);
+      
+      // Optionally update the local repo star count visually
+      setRepo(prev => ({
+        ...prev,
+        stars: res.data.starred ? (prev.stars + 1) : (prev.stars - 1)
+      }));
     } catch (err) {
       console.error("Error starring repo:", err);
     }
@@ -62,8 +71,6 @@ const RepoPage = () => {
 
   return (
     <div className="repo-wrapper">
-
-      {/* Header */}
       <div className="repo-header">
         <div className="repo-header-left">
           <BookIcon fontSize="small" className="repo-header-icon" />
@@ -95,7 +102,6 @@ const RepoPage = () => {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="repo-tabs">
         <button
           className={`repo-tab ${activeTab === "readme" ? "repo-tab-active" : ""}`}
@@ -112,13 +118,8 @@ const RepoPage = () => {
         </button>
       </div>
 
-      {/* Main content */}
       <div className="repo-main">
-
-        {/* Left content */}
         <div className="repo-content">
-
-          {/* README tab */}
           {activeTab === "readme" && (
             <div className="repo-readme-card">
               <div className="repo-readme-header">
@@ -135,7 +136,6 @@ const RepoPage = () => {
             </div>
           )}
 
-          {/* Issues tab */}
           {activeTab === "issues" && (
             <div>
               {repo.issues?.length === 0 ? (
@@ -156,12 +156,9 @@ const RepoPage = () => {
               )}
             </div>
           )}
-
         </div>
 
-        {/* Right sidebar */}
         <div className="repo-sidebar">
-
           <div className="repo-sidebar-section">
             <h4 className="repo-sidebar-title">About</h4>
             <p className="repo-sidebar-desc">
@@ -199,7 +196,6 @@ const RepoPage = () => {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

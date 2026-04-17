@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import HeatMap from "@uiw/react-heat-map";
 
-// Defined outside component so it never changes reference
+// Using a consistent date reference
 const START_DATE = new Date("2026/01/01");
 
-// Fixed threshold colors like GitHub style
+// Standard GitHub Contribution Colors
 const PANEL_COLORS = {
   0: "#161b22",
   10: "#0e4429",
@@ -13,44 +13,50 @@ const PANEL_COLORS = {
   40: "#39d353",
 };
 
-// Generate activity data with corrected date format
-const generateActivityData = (startDate, endDate) => {
+const generateActivityData = (startDateStr, endDateStr) => {
   const data = [];
-  let currentDate = new Date(startDate);
-  const end = new Date(endDate);
+  let currentDate = new Date(startDateStr);
+  const end = new Date(endDateStr);
 
   while (currentDate <= end) {
+    // Math.random simulation: in a real app, this would come from repo/user data
     const count = Math.floor(Math.random() * 50);
-    // Using replace to avoid timezone off-by-one-day issues
+    
+    // Formatting as YYYY/MM/DD to match the component's internal date handling
+    const formattedDate = currentDate.toISOString().split("T")[0].replace(/-/g, "/");
+    
     data.push({
-      date: currentDate.toISOString().split("T")[0].replace(/-/g, "/"),
+      date: formattedDate,
       count: count,
     });
+    
     currentDate.setDate(currentDate.getDate() + 1);
   }
   return data;
 };
 
 const HeatMapProfile = () => {
-  // useMemo so data is only generated once, not on every render
+  // Memoize data to prevent re-generation on every UI update/tab switch
   const activityData = useMemo(() => {
     return generateActivityData("2026/01/01", "2026/12/31");
   }, []);
 
   return (
-    <div>
-      <h4>Recent Contributions</h4>
+    <div className="heatmap-container">
+      <h4 style={{ color: "#8b949e", marginBottom: "10px", fontWeight: "400" }}>
+        Recent Contributions
+      </h4>
       <HeatMap
         className="HeatMapProfile"
-        style={{ color: "white" }}
-        width={700}
+        style={{ color: "#8b949e" }} // Lighter text color to match GitHub UI
+        width={720}
         value={activityData}
-        weekLabels={["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"]}
+        weekLabels={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
         startDate={START_DATE}
-        rectSize={15}
-        space={3}
+        rectSize={14}
+        space={4}
         rectProps={{
-          rx: 2.5,
+          rx: 3, // Slightly rounder corners for a modern look
         }}
         panelColors={PANEL_COLORS}
       />

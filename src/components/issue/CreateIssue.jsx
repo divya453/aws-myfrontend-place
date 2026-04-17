@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import axiosInstance from "../../axiosInstance"; // ← replaced axios
+import axiosInstance from "../../axiosInstance"; 
 import { useAuth } from "../../authContext";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CloseIcon from "@mui/icons-material/Close";
@@ -8,6 +8,7 @@ import "./createIssue.css";
 
 const CreateIssueModal = () => {
   const { isIssueModalOpen, setIsIssueModalOpen } = useAuth();
+  // Ensure we use the same key name as Login.jsx
   const loggedInUserId = localStorage.getItem("userId");
 
   const [repos, setRepos] = useState([]);
@@ -21,8 +22,11 @@ const CreateIssueModal = () => {
 
   useEffect(() => {
     const fetchRepos = async () => {
+      // Guard: Don't fetch if there's no logged-in user
+      if (!loggedInUserId) return;
+
       try {
-        const res = await axiosInstance.get(`/repo/user/${loggedInUserId}`); // ← updated
+        const res = await axiosInstance.get(`/repo/user/${loggedInUserId}`);
         const userRepos = res.data.repositories || [];
         setRepos(userRepos);
         if (userRepos.length > 0) {
@@ -64,7 +68,7 @@ const CreateIssueModal = () => {
     }
     try {
       setLoading(true);
-      await axiosInstance.post("/issue/create", { // ← updated
+      await axiosInstance.post("/issue/create", {
         title,
         description,
         repository: selectedRepo._id,
@@ -85,13 +89,11 @@ const CreateIssueModal = () => {
     <div className="issue-modal-overlay" onClick={handleClose}>
       <div className="issue-modal" onClick={(e) => e.stopPropagation()}>
 
-        {/* Modal header */}
         <div className="issue-modal-header">
           <h3>Create new issue</h3>
           <CloseIcon className="issue-modal-close" onClick={handleClose} />
         </div>
 
-        {/* Repo selector */}
         <div className="issue-modal-repo" ref={dropdownRef}>
           <label className="issue-modal-label">Repository</label>
           <div
@@ -124,7 +126,6 @@ const CreateIssueModal = () => {
           )}
         </div>
 
-        {/* Blank issue template */}
         {!showForm && (
           <div className="issue-modal-template" onClick={() => setShowForm(true)}>
             <div className="issue-modal-template-text">
@@ -135,7 +136,6 @@ const CreateIssueModal = () => {
           </div>
         )}
 
-        {/* Issue form */}
         {showForm && (
           <div className="issue-modal-form">
             <input

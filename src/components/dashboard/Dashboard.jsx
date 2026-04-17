@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+// Import your central instance
+import axiosInstance from "../../axiosInstance"; 
 import "./dashboard.css";
 import { Link } from "react-router-dom";
 import BookIcon from "@mui/icons-material/Book";
@@ -17,7 +18,8 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchRepositories = async () => {
       try {
-        const res = await axios.get(`https://version-backend-api.duckdns.org/repo/user/${userId}`);
+        // Use axiosInstance and relative path
+        const res = await axiosInstance.get(`/repo/user/${userId}`);
         setRepositories(res.data.repositories);
       } catch (err) {
         console.error("Error while fetching repositories:", err);
@@ -26,7 +28,8 @@ const Dashboard = () => {
 
     const fetchSuggestedRepositories = async () => {
       try {
-        const res = await axios.get(`https://version-backend-api.duckdns.org/repo/all`);
+        // Use axiosInstance and relative path
+        const res = await axiosInstance.get(`/repo/all`);
         setSuggestedRepositories(res.data);
       } catch (err) {
         console.error("Error while fetching suggested repositories:", err);
@@ -35,7 +38,8 @@ const Dashboard = () => {
 
     const fetchStarredRepos = async () => {
       try {
-        const res = await axios.get(`http://3.108.191.174:3000/userProfile/${userId}`);
+        // Use axiosInstance and relative path
+        const res = await axiosInstance.get(`/userProfile/${userId}`);
         const starred = res.data.starRepos?.map((id) => id.toString()) || [];
         setStarredRepos(starred);
       } catch (err) {
@@ -43,14 +47,13 @@ const Dashboard = () => {
       }
     };
 
-    fetchSuggestedRepositories(); // ← always runs, doesn't need userId
+    fetchSuggestedRepositories();
 
-    // ← only run if userId exists
     if (userId) {
       fetchRepositories();
       fetchStarredRepos();
     }
-  }, [userId]); // ← added userId as dependency so it re-runs when userId becomes available
+  }, [userId]);
 
   useEffect(() => {
     if (searchQuery === "") {
@@ -65,9 +68,10 @@ const Dashboard = () => {
 
   const handleStar = async (e, repoId) => {
     e.preventDefault();
-    if (!userId) return; // ← guard here too
+    if (!userId) return;
     try {
-      const res = await axios.post("http://3.108.191.174:3000/starRepo", {
+      // Use axiosInstance and relative path
+      const res = await axiosInstance.post("/starRepo", {
         userId,
         repoId: repoId.toString(),
       });
@@ -83,7 +87,6 @@ const Dashboard = () => {
 
   return (
     <section className="dashboard-wrapper">
-
       {/* Left - Suggested Repositories */}
       <aside className="dashboard-left">
         <h3 className="dashboard-section-title">Suggested Repositories</h3>
@@ -114,7 +117,6 @@ const Dashboard = () => {
         )}
       </aside>
 
-      {/* Vertical divider */}
       <div className="dashboard-divider" />
 
       {/* Main - Your Repositories */}
@@ -145,7 +147,6 @@ const Dashboard = () => {
         )}
       </main>
 
-      {/* Vertical divider */}
       <div className="dashboard-divider" />
 
       {/* Right - Upcoming Events */}
@@ -166,7 +167,6 @@ const Dashboard = () => {
           </div>
         </div>
       </aside>
-
     </section>
   );
 };

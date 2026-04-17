@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import axiosInstance from "../../axiosInstance"; 
 import { useAuth } from "../../authContext";
 import { Box, Button, Typography } from "@mui/material";
 import "./auth.css";
@@ -11,35 +11,27 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(""); // ← new
+  const [error, setError] = useState("");
 
   const { setCurrentUser } = useAuth();
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    setError(""); // ← clear previous error
+    setError(""); 
     try {
       setLoading(true);
-      const res = await axios.post(
-        "https://version-backend-api.duckdns.org/signup",
-        {
-          email: email,
-          password: password,
-          username: username,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      const res = await axiosInstance.post("/signup", {
+        email: email,
+        password: password,
+        username: username,
+      });
 
       localStorage.setItem("userId", res.data.userId);
       setCurrentUser(res.data.userId);
       setLoading(false);
       window.location.href = "/";
     } catch (err) {
-      // ← read the message from the server response if available
-      const message =
-        err.response?.data?.message || "Signup failed. Please try again.";
+      const message = err.response?.data?.message || "Signup failed. Please try again.";
       setError(message);
       setLoading(false);
     }
@@ -61,7 +53,6 @@ const Signup = () => {
         </div>
 
         <div className="login-box">
-          {/* ← error message shown inline, not as alert */}
           {error && (
             <Typography
               variant="body2"
@@ -82,8 +73,6 @@ const Signup = () => {
             <label className="label">Username</label>
             <input
               autoComplete="off"
-              name="Username"
-              id="Username"
               className="input"
               type="text"
               value={username}
@@ -95,8 +84,6 @@ const Signup = () => {
             <label className="label">Email address</label>
             <input
               autoComplete="off"
-              name="Email"
-              id="Email"
               className="input"
               type="email"
               value={email}
@@ -108,8 +95,6 @@ const Signup = () => {
             <label className="label">Password</label>
             <input
               autoComplete="off"
-              name="Password"
-              id="Password"
               className="input"
               type="password"
               value={password}

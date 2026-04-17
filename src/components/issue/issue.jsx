@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axiosInstance from "../../axiosInstance"; // ← replaced axios
+import axiosInstance from "../../axiosInstance"; 
 import AdjustRoundedIcon from "@mui/icons-material/AdjustRounded";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAuth } from "../../authContext";
@@ -16,7 +16,8 @@ const Issues = () => {
   useEffect(() => {
     const fetchIssues = async () => {
       try {
-        const res = await axiosInstance.get("/issue/all"); // ← updated
+        // Using the central instance handles the base URL and cookies automatically
+        const res = await axiosInstance.get("/issue/all"); 
         setIssues(res.data);
       } catch (err) {
         console.error("Error fetching issues:", err);
@@ -24,24 +25,20 @@ const Issues = () => {
         setLoading(false);
       }
     };
+    
     fetchIssues();
-  }, [userId]);
+  }, []); // Empty array because /issue/all pulls everything regardless of the URL param
 
   if (loading) return <h2 style={{ color: "white", padding: "20px" }}>Loading...</h2>;
 
   return (
     <div className="issues-wrapper">
-
-      {/* Header */}
       <div className="issues-header">
         <h2 className="issues-title">Issues</h2>
       </div>
 
-      {/* No issues state */}
       {issues.length === 0 ? (
         <div className="issues-empty-card">
-
-          {/* Close icon inside top right of card */}
           <div className="issues-empty-card-top">
             <CloseIcon
               className="issues-close-icon"
@@ -55,7 +52,6 @@ const Issues = () => {
             Issues help you track bugs, tasks and feature requests.
           </p>
 
-          {/* Create button bottom right */}
           <div className="issues-empty-card-bottom">
             <button
               className="issues-create-btn"
@@ -64,7 +60,6 @@ const Issues = () => {
               Create your first issue
             </button>
           </div>
-
         </div>
       ) : (
         <div className="issues-list">
@@ -81,7 +76,6 @@ const Issues = () => {
           ))}
         </div>
       )}
-
     </div>
   );
 };

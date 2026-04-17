@@ -22,14 +22,15 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    // If the server explicitly says i am not logged in anymore
-    if (error.response?.status === 401) {
+    // We only want to log out if the server DEFINITELY sent a 401.
+    // If it's a network error (no error.response), we stay logged in.
+    if (error.response && error.response.status === 401) {
       localStorage.removeItem("userId");
       localStorage.removeItem("token");
       window.location.href = "/auth";
     }
     
-    
+    console.error("API Error:", error.message);
     return Promise.reject(error);
   }
 );

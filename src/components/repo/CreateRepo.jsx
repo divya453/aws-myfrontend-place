@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../../axiosInstance"; // ← replaced axios
+import axiosInstance from "../../axiosInstance"; 
 import "./createrepo.css";
 
 const CreateRepo = () => {
@@ -16,13 +16,17 @@ const CreateRepo = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
+    // If no user is logged in, redirect them to login immediately
+    if (!loggedInUserId) {
+      navigate("/auth");
+      return;
+    }
+
     const fetchCurrentUser = async () => {
       try {
-        const res = await axiosInstance.get(`/userProfile/${loggedInUserId}`); // ← updated
-        setCurrentUser(res.data);
+        const res = await axiosInstance.get(`/userProfile/${loggedInUserId}`);
         setOwner(res.data);
         setOwnerSearch(res.data.username);
       } catch (err) {
@@ -32,7 +36,7 @@ const CreateRepo = () => {
 
     const fetchAllUsers = async () => {
       try {
-        const res = await axiosInstance.get("/allUsers"); // ← updated
+        const res = await axiosInstance.get("/allUsers");
         setAllUsers(res.data);
       } catch (err) {
         console.error("Error fetching users:", err);
@@ -41,7 +45,7 @@ const CreateRepo = () => {
 
     fetchCurrentUser();
     fetchAllUsers();
-  }, [loggedInUserId]);
+  }, [loggedInUserId, navigate]);
 
   const handleOwnerSearch = (e) => {
     const query = e.target.value;
@@ -78,7 +82,7 @@ const CreateRepo = () => {
 
     try {
       setLoading(true);
-      const res = await axiosInstance.post("/repo/create", { // ← updated
+      await axiosInstance.post("/repo/create", {
         name: repoName,
         description: description,
         visibility: visibility,
@@ -96,15 +100,10 @@ const CreateRepo = () => {
   return (
     <div className="create-repo-wrapper">
       <h2 className="create-repo-title">Create a new repository</h2>
-
       <hr className="create-repo-divider" />
 
       <div className="create-repo-form">
-
-        {/* Owner + Repo Name */}
         <div className="create-repo-row">
-
-          {/* Owner */}
           <div className="create-repo-field">
             <label className="create-repo-label">Owner</label>
             <div className="create-repo-owner-search">
@@ -137,7 +136,6 @@ const CreateRepo = () => {
 
           <span className="create-repo-slash">/</span>
 
-          {/* Repo Name */}
           <div className="create-repo-field">
             <label className="create-repo-label">Repository name</label>
             <input
@@ -150,7 +148,6 @@ const CreateRepo = () => {
           </div>
         </div>
 
-        {/* Description */}
         <div className="create-repo-field" style={{ marginTop: "20px" }}>
           <label className="create-repo-label">
             Description <span className="create-repo-optional">(optional)</span>
@@ -166,11 +163,9 @@ const CreateRepo = () => {
 
         <hr className="create-repo-divider" />
 
-        {/* Visibility */}
         <div className="create-repo-field">
           <label className="create-repo-label">Visibility</label>
           <div className="create-repo-visibility">
-
             <div
               className={`create-repo-visibility-option ${visibility ? "active" : ""}`}
               onClick={() => setVisibility(true)}
@@ -200,13 +195,11 @@ const CreateRepo = () => {
                 </p>
               </div>
             </div>
-
           </div>
         </div>
 
         <hr className="create-repo-divider" />
 
-        {/* Submit button */}
         <div className="create-repo-submit">
           <button
             className="create-repo-btn"
@@ -216,7 +209,6 @@ const CreateRepo = () => {
             {loading ? "Creating..." : "Create repository"}
           </button>
         </div>
-
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import axiosInstance from "../../axiosInstance"; 
 import { useAuth } from "../../authContext";
 import { Box, Button, Typography } from "@mui/material";
 import "./auth.css";
@@ -10,10 +10,9 @@ const Login = () => {
   const { setCurrentUser } = useAuth();
 
   useEffect(() => {
-    // ← clear userId from localStorage on login page load
     localStorage.removeItem("userId");
     setCurrentUser(null);
-  }, []);
+  }, [setCurrentUser]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,19 +22,11 @@ const Login = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await axios.post(
-        "https://version-backend-api.duckdns.org/login",
-        {
-          email: email,
-          password: password,
-        },
-        {
-          withCredentials: true, // ← required for cookies to be set
-        }
-      );
+      const res = await axiosInstance.post("/login", {
+        email: email,
+        password: password,
+      });
 
-      // ← no longer saving token in localStorage
-      // ← only save userId so we know who is logged in
       localStorage.setItem("userId", res.data.userId);
       setCurrentUser(res.data.userId);
       setLoading(false);
@@ -67,8 +58,6 @@ const Login = () => {
             <label className="label">Email address</label>
             <input
               autoComplete="off"
-              name="Email"
-              id="Email"
               className="input"
               type="email"
               value={email}
@@ -80,8 +69,6 @@ const Login = () => {
             <label className="label">Password</label>
             <input
               autoComplete="off"
-              name="Password"
-              id="Password"
               className="input"
               type="password"
               value={password}
