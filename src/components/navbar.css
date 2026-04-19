@@ -1,3 +1,5 @@
+/* Navbar · CSS */
+
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -33,12 +35,16 @@
   color: white !important;
 }
 
-/* Search */
-.navbar-search {
+/* ================================
+   SEARCH - DESKTOP
+================================ */
+.navbar-search-desktop {
   position: relative;
+  display: flex; /* ← was missing, caused inline-block collapse */
+  align-items: center;
 }
 
-.navbar-search input {
+.navbar-search-desktop input {
   background-color: #0d1117;
   border: 1px solid #30363d;
   border-radius: 5px;
@@ -48,12 +54,52 @@
   font-size: 0.85rem;
 }
 
-.navbar-search input:focus {
+.navbar-search-desktop input:focus {
   outline: none;
   border-color: white;
 }
 
-/* Search dropdown */
+/* ================================
+   SEARCH - MOBILE ICON + BOX
+================================ */
+.navbar-search-mobile {
+  display: none; /* hidden on desktop */
+  align-items: center;
+  position: static; /* ← don't create a stacking context on desktop */
+}
+
+.navbar-mobile-search-box {
+  position: fixed;
+  top: 57px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background-color: #161b22;
+  border-bottom: 1px solid #30363d;
+  padding: 10px 15px;
+  z-index: 999;
+  box-sizing: border-box;
+}
+
+.navbar-mobile-search-box input {
+  width: 100%;
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 5px;
+  padding: 8px 12px;
+  color: white;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
+
+.navbar-mobile-search-box input:focus {
+  outline: none;
+  border-color: white;
+}
+
+/* ================================
+   SEARCH DROPDOWN (shared)
+================================ */
 .navbar-search-dropdown {
   position: absolute;
   top: 110%;
@@ -66,6 +112,16 @@
   max-height: 400px;
   overflow-y: auto;
   padding: 5px 0;
+}
+
+/* On mobile, dropdown is inside the fixed search box,
+   so it needs to be relative to that, not the viewport */
+.navbar-mobile-search-box .navbar-search-dropdown {
+  position: relative; /* ← key fix for mobile dropdown */
+  top: 4px;
+  width: 100%;
+  left: 0;
+  border-radius: 0 0 8px 8px;
 }
 
 .navbar-search-section-title {
@@ -126,6 +182,9 @@
   margin: 0;
 }
 
+/* ================================
+   NAV LINKS & BUTTONS
+================================ */
 .navbar-link {
   color: white;
   text-decoration: none;
@@ -192,6 +251,9 @@
   background-color: #21262d;
 }
 
+/* ================================
+   TOOLTIPS & DROPDOWNS
+================================ */
 .navbar-tooltip-wrapper {
   position: relative;
   display: flex;
@@ -255,6 +317,15 @@
   background-color: #21262d;
 }
 
+.navbar-dropdown-danger {
+  color: #f85149;
+}
+
+.navbar-dropdown-danger:hover {
+  background-color: #2a1a1a;
+  color: #f85149;
+}
+
 .navbar-dropdown-divider {
   border: none;
   border-top: 1px solid #30363d;
@@ -276,6 +347,9 @@
   margin: 0;
 }
 
+/* ================================
+   SIDEBAR
+================================ */
 .sidebar {
   position: fixed;
   top: 0;
@@ -369,36 +443,47 @@
 }
 
 /* ================================
-   MOBILE RESPONSIVE (max 480px)
+   TABLET (max 768px)
 ================================ */
-@media screen and (max-width: 480px) {
-
+@media screen and (max-width: 768px) {
   .navbar {
     padding: 10px 15px;
   }
 
-  /* Hide search bar on mobile - use sidebar instead */
-  .navbar-search {
-    display: none;
+  .navbar-search-desktop input {
+    width: 150px;
   }
 
-  /* Hide issues, PR, repos icons on mobile */
-  .navbar-right .navbar-tooltip-wrapper:not(:last-child):not(:nth-last-child(2)) {
-    display: none;
-  }
-
-  /* Keep only plus button and avatar on mobile */
-  .navbar-right {
-    gap: 10px;
-  }
-
-  /* Search dropdown full width on mobile */
   .navbar-search-dropdown {
-    width: 100vw;
-    left: -15px;
+    width: 280px;
   }
 
-  /* Sidebar full width on mobile */
+  .navbar-right {
+    gap: 8px;
+  }
+}
+
+/* ================================
+   MOBILE (max 480px)
+================================ */
+@media screen and (max-width: 480px) {
+  .navbar {
+    padding: 10px 15px;
+  }
+
+  /* Hide desktop search, show mobile icon */
+  .navbar-search-desktop {
+    display: none;
+  }
+
+  .navbar-search-mobile {
+    display: flex; /* ← uses flex not block so icon aligns properly */
+  }
+
+  .navbar-right {
+    gap: 8px;
+  }
+
   .sidebar {
     width: 100%;
     left: -100%;
@@ -406,29 +491,5 @@
 
   .sidebar-open {
     left: 0;
-  }
-}
-
-/* ================================
-   TABLET RESPONSIVE (max 768px)
-================================ */
-@media screen and (max-width: 768px) {
-
-  .navbar {
-    padding: 10px 15px;
-  }
-
-  /* Smaller search bar on tablet */
-  .navbar-search input {
-    width: 150px;
-  }
-
-  /* Search dropdown full width on tablet */
-  .navbar-search-dropdown {
-    width: 280px;
-  }
-
-  .navbar-right {
-    gap: 8px;
   }
 }

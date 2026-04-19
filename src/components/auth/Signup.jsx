@@ -4,7 +4,7 @@ import { useAuth } from "../../authContext";
 import { Box, Button, Typography } from "@mui/material";
 import "./auth.css";
 import logo from "../../assets/github-mark-white.svg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -14,6 +14,7 @@ const Signup = () => {
   const [error, setError] = useState("");
 
   const { setCurrentUser } = useAuth();
+  const navigate = useNavigate(); 
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -29,7 +30,7 @@ const Signup = () => {
       localStorage.setItem("userId", res.data.userId);
       setCurrentUser(res.data.userId);
       setLoading(false);
-      window.location.href = "/";
+      navigate("/"); // ✅ fixed from window.location.href
     } catch (err) {
       const message = err.response?.data?.message || "Signup failed. Please try again.";
       setError(message);

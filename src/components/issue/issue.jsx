@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axiosInstance from "../../axiosInstance"; 
+import axiosInstance from "../../axiosInstance";
 import AdjustRoundedIcon from "@mui/icons-material/AdjustRounded";
 import CloseIcon from "@mui/icons-material/Close";
 import { useAuth } from "../../authContext";
@@ -16,18 +16,26 @@ const Issues = () => {
   useEffect(() => {
     const fetchIssues = async () => {
       try {
-        // Using the central instance handles the base URL and cookies automatically
-        const res = await axiosInstance.get("/issue/all"); 
-        setIssues(res.data);
+        const res = await axiosInstance.get("/issue/all");
+        const allIssues = Array.isArray(res.data) ? res.data : [];
+        const userIssues = allIssues.filter(
+          (issue) => issue.reporter?.toString() === userId?.toString()
+        );
+        setIssues(userIssues);
       } catch (err) {
-        console.error("Error fetching issues:", err);
+        // 404 means no issues in DB at all — treat as empty
+        if (err.response?.status === 404) {
+          setIssues([]);
+        } else {
+          console.error("Error fetching issues:", err);
+        }
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchIssues();
-  }, []); // Empty array because /issue/all pulls everything regardless of the URL param
+  }, [userId]);
 
   if (loading) return <h2 style={{ color: "white", padding: "20px" }}>Loading...</h2>;
 

@@ -9,7 +9,7 @@ const CreateRepo = () => {
 
   const [repoName, setRepoName] = useState("");
   const [description, setDescription] = useState("");
-  const [visibility, setVisibility] = useState(true);
+  const [visibility, setVisibility] = useState("public"); // ✅ fixed from true
   const [owner, setOwner] = useState(null);
   const [ownerSearch, setOwnerSearch] = useState("");
   const [allUsers, setAllUsers] = useState([]);
@@ -18,7 +18,6 @@ const CreateRepo = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // If no user is logged in, redirect them to login immediately
     if (!loggedInUserId) {
       navigate("/auth");
       return;
@@ -85,7 +84,7 @@ const CreateRepo = () => {
       await axiosInstance.post("/repo/create", {
         name: repoName,
         description: description,
-        visibility: visibility,
+        visibility: visibility, // ✅ now sends "public" or "private"
         owner: owner._id,
       });
       navigate(`/profile/${loggedInUserId}`);
@@ -167,11 +166,11 @@ const CreateRepo = () => {
           <label className="create-repo-label">Visibility</label>
           <div className="create-repo-visibility">
             <div
-              className={`create-repo-visibility-option ${visibility ? "active" : ""}`}
-              onClick={() => setVisibility(true)}
+              className={`create-repo-visibility-option ${visibility === "public" ? "active" : ""}`} // ✅ fixed
+              onClick={() => setVisibility("public")} // ✅ fixed
             >
               <div className="create-repo-visibility-radio">
-                {visibility && <div className="create-repo-visibility-radio-dot" />}
+                {visibility === "public" && <div className="create-repo-visibility-radio-dot" />} {/* ✅ fixed */}
               </div>
               <div>
                 <p className="create-repo-visibility-title">🌐 Public</p>
@@ -182,11 +181,11 @@ const CreateRepo = () => {
             </div>
 
             <div
-              className={`create-repo-visibility-option ${!visibility ? "active" : ""}`}
-              onClick={() => setVisibility(false)}
+              className={`create-repo-visibility-option ${visibility === "private" ? "active" : ""}`} // ✅ fixed
+              onClick={() => setVisibility("private")} // ✅ fixed
             >
               <div className="create-repo-visibility-radio">
-                {!visibility && <div className="create-repo-visibility-radio-dot" />}
+                {visibility === "private" && <div className="create-repo-visibility-radio-dot" />} {/* ✅ fixed */}
               </div>
               <div>
                 <p className="create-repo-visibility-title">🔒 Private</p>

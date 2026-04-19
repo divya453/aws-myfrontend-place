@@ -1,18 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axiosInstance from "../../axiosInstance"; 
 import { useAuth } from "../../authContext";
 import { Box, Button, Typography } from "@mui/material";
 import "./auth.css";
 import logo from "../../assets/github-mark-white.svg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const { setCurrentUser } = useAuth();
-
-  useEffect(() => {
-    localStorage.removeItem("userId");
-    setCurrentUser(null);
-  }, [setCurrentUser]);
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +26,7 @@ const Login = () => {
       localStorage.setItem("userId", res.data.userId);
       setCurrentUser(res.data.userId);
       setLoading(false);
-      window.location.href = "/";
+      navigate("/"); 
     } catch (err) {
       console.error(err);
       alert("Login Failed!");

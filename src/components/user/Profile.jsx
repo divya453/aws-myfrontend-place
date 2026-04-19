@@ -24,7 +24,6 @@ const Profile = () => {
     const fetchAllProfileData = async () => {
       setLoading(true);
       try {
-        // Fetch everything in parallel for better performance
         const [userRes, repoRes, allReposRes] = await Promise.all([
           axiosInstance.get(`/userProfile/${userId}`),
           axiosInstance.get(`/repo/user/${userId}`),
@@ -35,14 +34,13 @@ const Profile = () => {
         setUserDetails(userData);
         setRepositories(repoRes.data.repositories || []);
 
-        // Handle Starred Repos logic
-        const starredIds = userData.starRepos || [];
+        // ✅ fixed field name starRepos → starredRepos
+        const starredIds = userData.starredRepos || [];
         const starred = allReposRes.data.filter((repo) =>
           starredIds.some((id) => id.toString() === repo._id.toString())
         );
         setStarredRepoDetails(starred);
 
-        // Check follow status if logged in and not looking at own profile
         if (loggedInUserId && !isOwnProfile) {
           const loggedInUserRes = await axiosInstance.get(`/userProfile/${loggedInUserId}`);
           const alreadyFollowing = loggedInUserRes.data.followedUsers?.some(
@@ -71,6 +69,14 @@ const Profile = () => {
         targetUserId: userId,
       });
       setIsFollowing(res.data.following);
+
+      // ✅ update followers count in UI without refetching
+      setUserDetails(prev => ({
+        ...prev,
+        followers: res.data.following
+          ? [...(prev.followers || []), loggedInUserId]
+          : (prev.followers || []).filter(id => id.toString() !== loggedInUserId)
+      }));
     } catch (err) {
       console.error("Error following user:", err);
     }
@@ -81,7 +87,6 @@ const Profile = () => {
 
   return (
     <div className="profile-main-container">
-      {/* Tab bar */}
       <div className="profile-tabs">
         <button
           className={`profile-tab ${activeTab === "overview" ? "profile-tab-active" : ""}`}
@@ -101,12 +106,12 @@ const Profile = () => {
           onClick={() => setActiveTab("stars")}
         >
           <StarIcon fontSize="small" /> Stars
-          <span className="profile-tab-count">{userDetails.starRepos?.length || 0}</span>
+          {/* ✅ fixed field name */}
+          <span className="profile-tab-count">{userDetails.starredRepos?.length || 0}</span>
         </button>
       </div>
 
       <div className="profile-wrapper">
-        {/* Left sidebar */}
         <div className="profile-left">
           <div className="profile-avatar">
             {userDetails.username?.charAt(0).toUpperCase()}
@@ -125,11 +130,11 @@ const Profile = () => {
 
           <div className="profile-stats">
             <span><strong>{userDetails.followedUsers?.length || 0}</strong> Following</span>
-            <span><strong>0</strong> Followers</span>
+            {/* ✅ fixed from hardcoded 0 */}
+            <span><strong>{userDetails.followers?.length || 0}</strong> Followers</span>
           </div>
         </div>
 
-        {/* Right main content */}
         <div className="profile-right">
           {activeTab === "overview" && (
             <div>
@@ -139,8 +144,8 @@ const Profile = () => {
               ) : (
                 <div className="profile-repos-grid">
                   {repositories.slice(0, 6).map((repo) => (
-                    <div 
-                      key={repo._id} 
+                    <div
+                      key={repo._id}
                       className="profile-repo-card"
                       onClick={() => navigate(`/repo/${repo._id}`)}
                       style={{ cursor: "pointer" }}
@@ -167,8 +172,8 @@ const Profile = () => {
               ) : (
                 <div className="profile-repos-list">
                   {repositories.map((repo) => (
-                    <div 
-                      key={repo._id} 
+                    <div
+                      key={repo._id}
                       className="profile-repo-card"
                       onClick={() => navigate(`/repo/${repo._id}`)}
                       style={{ cursor: "pointer" }}
@@ -193,8 +198,8 @@ const Profile = () => {
               ) : (
                 <div className="profile-repos-list">
                   {starredRepoDetails.map((repo) => (
-                    <div 
-                      key={repo._id} 
+                    <div
+                      key={repo._id}
                       className="profile-repo-card"
                       onClick={() => navigate(`/repo/${repo._id}`)}
                       style={{ cursor: "pointer" }}

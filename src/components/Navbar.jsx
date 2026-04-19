@@ -9,6 +9,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import SearchIcon from "@mui/icons-material/Search";
 import logo from "../assets/github-mark-white.svg";
 import { useAuth } from "../authContext";
 import "./navbar.css";
@@ -22,13 +23,15 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState({ users: [], repos: [] });
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
 
   const userId = localStorage.getItem("userId");
   const navigate = useNavigate();
   const plusRef = useRef(null);
   const profileRef = useRef(null);
   const repoRef = useRef(null);
-  const searchRef = useRef(null);
+  const searchDesktopRef = useRef(null);
+  const searchMobileRef = useRef(null);
 
   const { logout, setIsIssueModalOpen } = useAuth();
 
@@ -36,9 +39,7 @@ const Navbar = () => {
     const fetchTopRepos = async () => {
       try {
         const res = await axiosInstance.get(`/repo/user/${userId}`);
-        // Safely access repositories array
-        const repos = res.data.repositories || [];
-        setTopRepos(repos.slice(0, 3));
+        setTopRepos(res.data.repositories.slice(0, 3));
       } catch (err) {
         console.error("Error fetching top repos:", err);
       }
@@ -46,41 +47,42 @@ const Navbar = () => {
     if (userId) fetchTopRepos();
   }, [userId]);
 
-  // Handle outside clicks for all dropdowns
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (plusRef.current && !plusRef.current.contains(e.target)) setPlusDropdown(false);
       if (profileRef.current && !profileRef.current.contains(e.target)) setProfileDropdown(false);
       if (repoRef.current && !repoRef.current.contains(e.target)) setRepoDropdown(false);
-      if (searchRef.current && !searchRef.current.contains(e.target)) setShowSearchDropdown(false);
+      if (searchDesktopRef.current && !searchDesktopRef.current.contains(e.target)) {
+        setShowSearchDropdown(false);
+      }
+      if (searchMobileRef.current && !searchMobileRef.current.contains(e.target)) {
+        setShowSearchDropdown(false);
+        setShowMobileSearch(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Debounced Search Logic
   useEffect(() => {
-    if (!searchQuery.trim()) {
+    if (searchQuery.trim() === "") {
       setSearchResults({ users: [], repos: [] });
       setShowSearchDropdown(false);
       return;
     }
 
-    const performSearch = async () => {
+    const search = async () => {
       try {
-        // Parallel requests for speed
         const [usersRes, reposRes] = await Promise.all([
           axiosInstance.get("/allUsers"),
           axiosInstance.get("/repo/all"),
         ]);
-
         const filteredUsers = usersRes.data.filter((user) =>
-          user.username?.toLowerCase().includes(searchQuery.toLowerCase())
+          user.username.toLowerCase().includes(searchQuery.toLowerCase())
         );
         const filteredRepos = reposRes.data.filter((repo) =>
-          repo.name?.toLowerCase().includes(searchQuery.toLowerCase())
+          repo.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
-
         setSearchResults({ users: filteredUsers, repos: filteredRepos });
         setShowSearchDropdown(true);
       } catch (err) {
@@ -88,29 +90,44 @@ const Navbar = () => {
       }
     };
 
-    const debounceTimer = setTimeout(performSearch, 300);
-    return () => clearTimeout(debounceTimer);
+    const debounce = setTimeout(search, 300);
+    return () => clearTimeout(debounce);
   }, [searchQuery]);
 
   const handleLogout = async () => {
     try {
       await axiosInstance.post("/logout");
-      // Clear local storage and context
-      localStorage.removeItem("token");
-      localStorage.removeItem("userId");
-      logout(); 
-      navigate("/auth");
     } catch (err) {
       console.error("Logout error:", err);
-      // Still logout locally even if server call fails
+    }
+    logout();
+    navigate("/auth");
+  };
+
+  const handleDeleteProfile = async () => {
+    const confirm = window.confirm("Are you sure you want to delete your profile? This cannot be undone!");
+    if (!confirm) return;
+    try {
+      await axiosInstance.delete(`/deleteUserProfile/${userId}`);
       logout();
       navigate("/auth");
+    } catch (err) {
+      console.error("Error deleting profile:", err);
+      alert("Failed to delete profile!");
     }
+  };
+
+  const handleSearchNavigate = (path) => {
+    setSearchQuery("");
+    setShowSearchDropdown(false);
+    setShowMobileSearch(false);
+    navigate(path);
   };
 
   return (
     <>
       <nav className="navbar">
+        {/* Left side */}
         <div className="navbar-left">
           <MenuIcon className="navbar-icon" onClick={() => setSidebarOpen(true)} />
           <Link to="/">
@@ -118,31 +135,30 @@ const Navbar = () => {
           </Link>
         </div>
 
+        {/* Right side */}
         <div className="navbar-right">
-          {/* Search bar */}
-          <div className="navbar-search" ref={searchRef}>
+
+          {/* Search bar - desktop */}
+          <div className="navbar-search navbar-search-desktop" ref={searchDesktopRef}>
             <input
+              id="navbar-search-desktop"
+              name="navbar-search-desktop"
               type="text"
               placeholder="Search users or repos..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => searchQuery && setShowSearchDropdown(true)}
             />
-
             {showSearchDropdown && (
               <div className="navbar-search-dropdown">
                 {searchResults.users.length > 0 && (
-                  <div className="search-section">
+                  <div>
                     <p className="navbar-search-section-title">Users</p>
                     {searchResults.users.map((user) => (
                       <div
                         key={user._id}
                         className="navbar-search-item"
-                        onClick={() => {
-                          navigate(`/profile/${user._id}`);
-                          setSearchQuery("");
-                          setShowSearchDropdown(false);
-                        }}
+                        onMouseDown={() => handleSearchNavigate(`/profile/${user._id}`)}
                       >
                         <div className="navbar-search-avatar">
                           {user.username?.charAt(0).toUpperCase()}
@@ -152,19 +168,14 @@ const Navbar = () => {
                     ))}
                   </div>
                 )}
-
                 {searchResults.repos.length > 0 && (
-                  <div className="search-section">
+                  <div>
                     <p className="navbar-search-section-title">Repositories</p>
                     {searchResults.repos.map((repo) => (
                       <div
                         key={repo._id}
                         className="navbar-search-item"
-                        onClick={() => {
-                          navigate(`/repo/${repo._id}`);
-                          setSearchQuery("");
-                          setShowSearchDropdown(false);
-                        }}
+                        onMouseDown={() => handleSearchNavigate(`/repo/${repo._id}`)}
                       >
                         <BookIcon fontSize="small" style={{ color: "#8b949e" }} />
                         <div>
@@ -175,82 +186,207 @@ const Navbar = () => {
                     ))}
                   </div>
                 )}
-
                 {searchResults.users.length === 0 && searchResults.repos.length === 0 && (
-                  <p className="navbar-search-empty">No results for "{searchQuery}"</p>
+                  <p className="navbar-search-empty">No results found for "{searchQuery}"</p>
                 )}
               </div>
             )}
           </div>
 
-          {/* Action Icons */}
-          <div className="navbar-actions">
-             {/* Plus Dropdown */}
-            <div className="navbar-tooltip-wrapper" ref={plusRef}>
-              <div className="navbar-plus-box" onClick={() => setPlusDropdown(!plusDropdown)}>
-                <AddIcon fontSize="small" />
-                <ArrowDropDownIcon fontSize="small" />
-              </div>
-              {plusDropdown && (
-                <div className="navbar-dropdown">
-                  <Link to="/repo/create" className="navbar-dropdown-item" onClick={() => setPlusDropdown(false)}>
-                    <BookIcon fontSize="small" /> New repository
-                  </Link>
-                  <div className="navbar-dropdown-item" onClick={() => { setIsIssueModalOpen(true); setPlusDropdown(false); }}>
-                    <AdjustRoundedIcon fontSize="small" /> New issue
-                  </div>
-                </div>
-              )}
+          {/* Search icon - mobile only */}
+          <div className="navbar-search-mobile" ref={searchMobileRef}>
+            <div className="navbar-icon-box" onClick={() => setShowMobileSearch(!showMobileSearch)}>
+              <SearchIcon fontSize="small" />
             </div>
-
-            <Link to={`/issues/${userId}`} className="navbar-icon-box"><AdjustRoundedIcon fontSize="small" /></Link>
-            <Link to={`/pullrequests/${userId}`} className="navbar-icon-box"><CallMergeRoundedIcon fontSize="small" /></Link>
-
-            {/* Repos Dropdown */}
-            <div className="navbar-tooltip-wrapper" ref={repoRef}>
-              <div className="navbar-icon-box" onClick={() => setRepoDropdown(!repoDropdown)}>
-                <BookIcon fontSize="small" style={{ color: "white" }} />
+            {showMobileSearch && (
+              <div className="navbar-mobile-search-box">
+                <input
+                  id="navbar-search-mobile"
+                  name="navbar-search-mobile"
+                  type="text"
+                  placeholder="Search users or repos..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                />
+                {showSearchDropdown && (
+                  <div className="navbar-search-dropdown">
+                    {searchResults.users.length > 0 && (
+                      <div>
+                        <p className="navbar-search-section-title">Users</p>
+                        {searchResults.users.map((user) => (
+                          <div
+                            key={user._id}
+                            className="navbar-search-item"
+                            onMouseDown={() => handleSearchNavigate(`/profile/${user._id}`)}
+                          >
+                            <div className="navbar-search-avatar">
+                              {user.username?.charAt(0).toUpperCase()}
+                            </div>
+                            <span>{user.username}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {searchResults.repos.length > 0 && (
+                      <div>
+                        <p className="navbar-search-section-title">Repositories</p>
+                        {searchResults.repos.map((repo) => (
+                          <div
+                            key={repo._id}
+                            className="navbar-search-item"
+                            onMouseDown={() => handleSearchNavigate(`/repo/${repo._id}`)}
+                          >
+                            <BookIcon fontSize="small" style={{ color: "#8b949e" }} />
+                            <div>
+                              <p className="navbar-search-item-name">{repo.name}</p>
+                              <p className="navbar-search-item-desc">{repo.description}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {searchResults.users.length === 0 && searchResults.repos.length === 0 && (
+                      <p className="navbar-search-empty">No results found for "{searchQuery}"</p>
+                    )}
+                  </div>
+                )}
               </div>
-              {repoDropdown && (
-                <div className="navbar-dropdown navbar-dropdown-right">
-                  <p className="navbar-dropdown-header">Top Repositories</p>
-                  <hr className="navbar-dropdown-divider" />
-                  {topRepos.map((repo) => (
+            )}
+          </div>
+
+          {/* Plus icon */}
+          <div className="navbar-tooltip-wrapper" ref={plusRef}>
+            <div className="navbar-plus-box" onClick={() => setPlusDropdown(!plusDropdown)}>
+              <AddIcon fontSize="small" />
+              <span className="navbar-plus-divider"></span>
+              <ArrowDropDownIcon fontSize="small" />
+            </div>
+            <span className="navbar-tooltip">Create new...</span>
+            {plusDropdown && (
+              <div className="navbar-dropdown">
+                <Link to="/repo/create" className="navbar-dropdown-item" onClick={() => setPlusDropdown(false)}>
+                  <BookIcon fontSize="small" /> New repository
+                </Link>
+                <div
+                  className="navbar-dropdown-item"
+                  onClick={() => {
+                    setIsIssueModalOpen(true);
+                    setPlusDropdown(false);
+                  }}
+                >
+                  <AdjustRoundedIcon fontSize="small" /> New issue
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Issues icon */}
+          <div className="navbar-tooltip-wrapper">
+            <Link to={`/issues/${userId}`} className="navbar-icon-box">
+              <AdjustRoundedIcon fontSize="small" />
+            </Link>
+            <span className="navbar-tooltip">Issues</span>
+          </div>
+
+          {/* Pull Requests icon */}
+          <div className="navbar-tooltip-wrapper">
+            <Link to={`/pullrequests/${userId}`} className="navbar-icon-box">
+              <CallMergeRoundedIcon fontSize="small" />
+            </Link>
+            <span className="navbar-tooltip">Pull Requests</span>
+          </div>
+
+          {/* Repos icon */}
+          <div className="navbar-tooltip-wrapper" ref={repoRef}>
+            <div className="navbar-icon-box" onClick={() => setRepoDropdown(!repoDropdown)}>
+              <BookIcon fontSize="small" style={{ cursor: "pointer", color: "white" }} />
+            </div>
+            <span className="navbar-tooltip">Your Repositories</span>
+            {repoDropdown && (
+              <div className="navbar-dropdown navbar-dropdown-right">
+                <p className="navbar-dropdown-header">Your Repositories</p>
+                <hr className="navbar-dropdown-divider" />
+                {topRepos.length === 0 ? (
+                  <p className="navbar-dropdown-empty">No repositories yet</p>
+                ) : (
+                  topRepos.map((repo) => (
                     <Link key={repo._id} to={`/repo/${repo._id}`} className="navbar-dropdown-item" onClick={() => setRepoDropdown(false)}>
                       <BookIcon fontSize="small" /> {repo.name}
                     </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Profile Dropdown */}
-            <div className="navbar-tooltip-wrapper" ref={profileRef}>
-              <div className="navbar-avatar" onClick={() => setProfileDropdown(!profileDropdown)}>
-                {userId?.charAt(0).toUpperCase()}
+                  ))
+                )}
               </div>
-              {profileDropdown && (
-                <div className="navbar-dropdown navbar-dropdown-right">
-                  <Link to={`/profile/${userId}`} className="navbar-dropdown-item" onClick={() => setProfileDropdown(false)}>Your Profile</Link>
-                  <hr className="navbar-dropdown-divider" />
-                  <div className="navbar-dropdown-item" onClick={handleLogout}>Sign out</div>
-                </div>
-              )}
-            </div>
+            )}
           </div>
+
+          {/* Profile avatar */}
+          <div className="navbar-tooltip-wrapper" ref={profileRef}>
+            <div className="navbar-avatar" onClick={() => setProfileDropdown(!profileDropdown)}>
+              {userId?.charAt(0).toUpperCase()}
+            </div>
+            {profileDropdown && (
+              <div className="navbar-dropdown navbar-dropdown-right">
+                <Link to={`/profile/${userId}`} className="navbar-dropdown-item" onClick={() => setProfileDropdown(false)}>
+                  Your Profile
+                </Link>
+                <Link to="/" className="navbar-dropdown-item" onClick={() => setProfileDropdown(false)}>
+                  Your Repositories
+                </Link>
+                <hr className="navbar-dropdown-divider" />
+                <div
+                  className="navbar-dropdown-item navbar-dropdown-danger"
+                  onClick={handleDeleteProfile}
+                >
+                  Delete Profile
+                </div>
+                <hr className="navbar-dropdown-divider" />
+                <div className="navbar-dropdown-item" onClick={handleLogout}>
+                  Sign out
+                </div>
+              </div>
+            )}
+          </div>
+
         </div>
       </nav>
 
-      {/* Sidebar logic remains same */}
-      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
+      {/* Overlay */}
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      {/* Sidebar */}
       <div className={`sidebar ${sidebarOpen ? "sidebar-open" : ""}`}>
         <div className="sidebar-header">
           <span>Menu</span>
           <CloseIcon onClick={() => setSidebarOpen(false)} style={{ cursor: "pointer" }} />
         </div>
         <div className="sidebar-menu">
-          <Link to="/" className="sidebar-link" onClick={() => setSidebarOpen(false)}><HomeIcon fontSize="small" /> Home</Link>
-          <Link to={`/profile/${userId}`} className="sidebar-link" onClick={() => setSidebarOpen(false)}><BookIcon fontSize="small" /> Profile</Link>
+          <Link to="/" className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+            <HomeIcon fontSize="small" /> Home
+          </Link>
+          <Link to="/" className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+            <BookIcon fontSize="small" /> Repositories
+          </Link>
+          <Link to={`/issues/${userId}`} className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+            <AdjustRoundedIcon fontSize="small" /> Issues
+          </Link>
+          <Link to={`/pullrequests/${userId}`} className="sidebar-link" onClick={() => setSidebarOpen(false)}>
+            <CallMergeRoundedIcon fontSize="small" /> Pull Requests
+          </Link>
+        </div>
+        <div className="sidebar-top-repos">
+          <p className="sidebar-repos-title">Top Repositories</p>
+          {topRepos.length === 0 ? (
+            <p className="sidebar-no-repos">No repositories yet</p>
+          ) : (
+            topRepos.map((repo) => (
+              <Link key={repo._id} to={`/repo/${repo._id}`} className="sidebar-repo-link" onClick={() => setSidebarOpen(false)}>
+                <BookIcon fontSize="small" /> {repo.name}
+              </Link>
+            ))
+          )}
         </div>
       </div>
     </>

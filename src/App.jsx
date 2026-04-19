@@ -3,7 +3,7 @@ import ProjectRoutes from "./Routes";
 import { AuthProvider, useAuth } from "./authContext";
 import Navbar from "./components/Navbar";
 import CreateIssueModal from "./components/issue/CreateIssue";
-import './index.css';
+
 const Layout = () => {
   const { currentUser } = useAuth();
 

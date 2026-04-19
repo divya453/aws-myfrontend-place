@@ -10,3 +10,6 @@ body {
   font-family: 'Montserrat', sans-serif;
   overflow-x: hidden; /* Prevents annoying side-scrolling on mobile */
 }
+html {
+  overflow-x: hidden;
+}
